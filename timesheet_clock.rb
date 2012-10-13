@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 require 'date'
+require_relative 'timesheet'
 
 class TimesheetClock
 
@@ -14,7 +15,8 @@ class TimesheetClock
 			raise "Already clocked in"
 		end
 
-		start_of_entry = Time.at(self.now_rounded()).strftime("%Y%m%d#{@delimiter}%H:%M#{@delimiter}")
+		start_timestamp = self.now_rounded()
+		start_of_entry = "#{ToS.date(start_timestamp)}#{@delimiter}#{ToS.time(start_timestamp)}#{@delimiter}"
 		File.open(@timesheet_filename, 'a') { |f|
 			f.write(start_of_entry)
 		}
@@ -28,13 +30,13 @@ class TimesheetClock
 			raise "Not clocked in"
 		end
 
-		clocked_in_timestamp = DateTime.parse(last_entry+Time.now.zone).to_time.to_i
+		clocked_in_timestamp = DateTime.parse(last_entry).to_time.to_i
 		clocked_out_timestamp = self.now_rounded()
 		if clocked_in_timestamp == clocked_out_timestamp
 			clocked_out_timestamp += @rounding_amount
 		end
 
-		rest_of_entry = Time.at(clocked_out_timestamp).strftime("%H:%M")+"#{@delimiter}#{comment}\n"
+		rest_of_entry = "#{ToS.time(clocked_out_timestamp)}#{@delimiter}#{comment}\n"
 		File.open(@timesheet_filename, 'a') { |f|
 			f.write(rest_of_entry)
 		}
@@ -58,6 +60,8 @@ class TimesheetClock
 
 	def now_rounded()
 		now = Time.now.to_i
+		now += Time.now.utc_offset # now as if it was utc
+
 		seconds_past_now_floored = now % @rounding_amount
 		now_floored = now - seconds_past_now_floored
 
