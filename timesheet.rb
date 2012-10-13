@@ -67,8 +67,8 @@ class Timesheet
 
 	def initialize(metadata, entries)
 		@metadata = metadata
-		@entries = entries.sort { |entry|
-			entry.start
+		@entries = entries.sort { |a, b|
+			a.start <=> b.start
 		}
 	end
 
