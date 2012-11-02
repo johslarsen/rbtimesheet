@@ -38,6 +38,12 @@ class Entry
 		@start = utime_start
 		@end = utime_end
 		@comment = comment
+
+		if utime_end <= utime_start
+			raise "start cannot be after end"
+		elsif utime_end > self.midnight()+SECONDS_IN_A_DAY
+			raise "start and end of en entry must be on the same day"
+		end
 	end
 
 	def to_s()
