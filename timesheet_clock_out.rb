@@ -2,7 +2,7 @@
 require_relative 'timesheet_clock'
 
 if ARGV.length != 2
-	$stderr.puts("USAGE: #{$0} TIMESHEET_FILE COMMENT")
+	$stderr.puts("Usage: #{$0} TIMESHEET_FILE COMMENT")
 	exit(1)
 end
 

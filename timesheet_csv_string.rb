@@ -18,7 +18,7 @@ class TimesheetCSVString < Timesheet
 		@metadata = {}
 		@entries = []
 
-		csv.split("\n").each { |row|
+		csv.split("\n").each do |row|
 			next if row.empty?
 
 			if row[0] == COMMENT_CHAR
@@ -26,7 +26,7 @@ class TimesheetCSVString < Timesheet
 			else
 				self.parse_entry(row, delimiter)
 			end
-		}
+		end
 
 		super(@metadata, @entries)
 	end
@@ -39,7 +39,7 @@ class TimesheetCSVString < Timesheet
 	end
 
 	def parse_date(date)
-		return DateTime.parse(date).to_time.to_i
+		DateTime.parse(date).to_time.to_i
 	end
 
 	def parse_time(time)

@@ -3,7 +3,7 @@ require_relative 'timesheet_ascii_tables'
 require_relative 'timesheet_csv_string'
 
 if 1 > ARGV.length || ARGV.length > 2
-	$stderr.puts("USAGE: #{$0} TIMESHEET_FILE [DELIMITER]")
+	$stderr.puts("Usage: #{$0} TIMESHEET_FILE [DELIMITER]")
 	exit(1)
 end
 
@@ -11,12 +11,11 @@ end
 if ARGV[0] == "-"
 	csv = $stdin.read
 else
-	csv = File.open(ARGV[0]) { |f|
-		f.read()
-	}
+	csv = File.open(ARGV[0]) { |f| f.read() }
 end
+delimiter = ARGV.length == 2 ? ARGV[1] : "\t"
 
-ts = TimesheetCSVString.new(csv, ARGV.length == 2 ? ARGV[1] : "\t")
+ts = TimesheetCSVString.new(csv, delimiter)
 ts_table = TimesheetASCIITables.new(ts)
 
 puts "##### Report for the timesheet \"#{ARGV[0]}\" #####"

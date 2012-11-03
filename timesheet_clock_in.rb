@@ -2,7 +2,7 @@
 require_relative 'timesheet_clock'
 
 if ARGV.length != 1
-	$stderr.puts("USAGE: #{$0} TIMESHEET_FILE")
+	$stderr.puts("Usage: #{$0} TIMESHEET_FILE")
 	exit(1)
 end
 

@@ -17,9 +17,7 @@ class TimesheetClock
 
 		start_timestamp = self.now_rounded()
 		start_of_entry = "#{ToS.date(start_timestamp)}#{@delimiter}#{ToS.time(start_timestamp)}#{@delimiter}"
-		File.open(@timesheet_filename, 'a') { |f|
-			f.write(start_of_entry)
-		}
+		File.open(@timesheet_filename, 'a') { |f| f.write(start_of_entry) }
 
 		return start_of_entry
 	end
@@ -37,9 +35,7 @@ class TimesheetClock
 		end
 
 		rest_of_entry = "#{ToS.time(clocked_out_timestamp)}#{@delimiter}#{comment}\n"
-		File.open(@timesheet_filename, 'a') { |f|
-			f.write(rest_of_entry)
-		}
+		File.open(@timesheet_filename, 'a') { |f| f.write(rest_of_entry) }
 
 		return last_entry+rest_of_entry
 	end
@@ -48,14 +44,13 @@ class TimesheetClock
 		if last_entry == nil
 			last_entry = self.last_entry()
 		end
+
 		return last_entry.count(@delimiter) < 3
 	end
 
 	protected
 	def last_entry()
-		return File.open(@timesheet_filename).inject { |_, last_line|
-			last_line
-		}
+		File.open(@timesheet_filename).inject { |_, last_line| last_line }
 	end
 
 	def now_rounded()
@@ -67,5 +62,5 @@ class TimesheetClock
 
 		return seconds_past_now_floored > @rounding_amount/2 ? now_floored+@rounding_amount : now_floored
 	end
-
+	
 end
