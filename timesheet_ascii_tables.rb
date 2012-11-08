@@ -8,7 +8,7 @@ class TimesheetASCIITables
 	end
 
 	def entries()
-		@timesheet.entries.inject { |memo, obj| "#{memo}\n#{obj}" }+"\n"
+		@timesheet.map{|obj|obj}.join("\n")
 	end
 
 	def metadata()
@@ -21,16 +21,7 @@ class TimesheetASCIITables
 	end
 
 	def summary()
-		currency = ""
-		rate_unit = ""
-		if @timesheet.rate_currency?
-			currency = "[#{@timesheet.rate_currency()}]"
-			rate_unit = "[#{currency[1..-2]}/Hour]"
-		end
-
-		rate_and_value = "* %d%s = %s%s" % [@timesheet.rate, rate_unit, ToS.value(@timesheet.value), currency]
-
-		[ToS.date(@timesheet.start), "---", ToS.time(@timesheet.start), ToS.time(@timesheet.end), ToS.duration(@timesheet.duration), rate_and_value].join(" ")
+		@timesheet.summary()
 	end
 
 	def sum_by_hour(skip_empty = true)
@@ -55,8 +46,8 @@ class TimesheetASCIITables
 		end
 	end
 
-	def sum_by_date()
-		@timesheet.sum_by_date_str.inject("") do |table, date_and_duration; date, duration|
+	def sum_by_date
+		@timesheet.sum_by_date.inject("") do |table, date_and_duration; date, duration|
 			date, duration = date_and_duration
 			"%s%s %s\n" % [table, date, ToS.duration(duration)]
 		end

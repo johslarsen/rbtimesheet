@@ -25,11 +25,11 @@ puts "--------"
 puts ts_table.metadata()
 puts
 if ts.rate?
-	puts "      From             To  Duration * Rate = Value"
-	puts "----------     ----------  -----------------------"
+	puts "      From             To Duration * Rate = Value"
+	puts "----------     ---------- -----------------------"
 else
-	puts "      From             To  Duration"
-	puts "----------     ----------  --------"
+	puts "      From             To Duration"
+	puts "----------     ---------- --------"
 end
 puts ts_table.summary()
 puts
