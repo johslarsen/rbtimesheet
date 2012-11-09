@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby
-require_relative 'timesheet_ascii_tables'
-require_relative 'timesheet_csv_string'
+require_relative '../lib/timesheet/ascii_tables'
+require_relative '../lib/timesheet/parser'
 
 if 1 > ARGV.length || ARGV.length > 2
 	$stderr.puts("Usage: #{$0} TIMESHEET_FILE [DELIMITER]")
@@ -15,8 +15,8 @@ else
 end
 delimiter = ARGV.length == 2 ? ARGV[1] : "\t"
 
-ts = TimesheetCSVString.new(csv, delimiter)
-ts_table = TimesheetASCIITables.new(ts)
+ts = Timesheet::Parser.csv(csv, delimiter)
+ts_table = Timesheet::AsciiTables.new(ts)
 
 puts "##### Report for the timesheet \"#{ARGV[0]}\" #####"
 puts
