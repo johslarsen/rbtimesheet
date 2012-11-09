@@ -16,7 +16,7 @@ module Timesheet
 			@comment = comment.to_s
 
 			raise ArgumentError, "from must be before to" unless @from < @to
-			raise ArgumentError, "from and to must be on the same day" unless @to < self.midnight+SECONDS_IN_A_DAY
+			raise ArgumentError, "from and to must be on the same day" unless @to <= self.midnight+SECONDS_IN_A_DAY
 			raise ArgumentError, "Require non-empty comment" unless !@comment.empty?
 		end
 

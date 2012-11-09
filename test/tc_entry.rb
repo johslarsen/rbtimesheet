@@ -51,7 +51,7 @@ class TestEntry < MiniTest::Unit::TestCase
 	end
 
 	def test_boundary
-		refute_nil(Timesheet::Entry.new(@midnight, @midnight+Timesheet::SECONDS_IN_A_DAY-1, "something"))
-		assert_raises(ArgumentError) {Timesheet::Entry.new(@midnight, @midnight+Timesheet::SECONDS_IN_A_DAY, "something")}
+		refute_nil(Timesheet::Entry.new(@midnight, @midnight+Timesheet::SECONDS_IN_A_DAY, "something"))
+		assert_raises(ArgumentError) {Timesheet::Entry.new(@midnight, @midnight+Timesheet::SECONDS_IN_A_DAY+1, "something")}
 	end
 end

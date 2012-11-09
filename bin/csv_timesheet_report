@@ -15,7 +15,7 @@ else
 end
 delimiter = ARGV.length == 2 ? ARGV[1] : "\t"
 
-ts = Timesheet::Parser.csv(csv, delimiter)
+ts = Timesheet::Parser.new(delimiter:delimiter).csv(csv)
 ts_table = Timesheet::AsciiTables.new(ts)
 
 puts "##### Report for the timesheet \"#{ARGV[0]}\" #####"

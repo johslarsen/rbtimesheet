@@ -1,4 +1,3 @@
-#!/usr/bin/env ruby
 require 'date'
 require 'json'
 require_relative 'document'
@@ -7,15 +6,24 @@ require_relative 'entry'
 module Timesheet
 	class Parser
 
-		FIELD_DATE      = 0
-		FIELD_TIME_FROM = 1
-		FIELD_TIME_TO   = 2
-		FIELD_COMMENT   = 3..-1
+		DEFAULT_FIELD_MAP = {
+			date_from: 0,
+			date_to:   0, # intentionally the same field
+			time_from: 1,
+			time_to:   2,
+			comment:   3..-1,
+		}.freeze
 
 		COMMENT_CHAR = "#"
 		TIME_DELIMITER = ":"
 
-		def self.csv(csv, delimiter = "\t")
+		def initialize(override_field_map = {})
+			@field_map = DEFAULT_FIELD_MAP.merge(override_field_map).freeze
+		end
+
+		def csv(csv, delimiter = "\t")
+			@delimiter = delimiter
+
 			metadata = {}
 			entries = []
 
@@ -23,9 +31,9 @@ module Timesheet
 				next if row.empty?
 
 				if row[0] == COMMENT_CHAR
-					metadata.merge!(self.csv_comment(row[1..-1]))
+					metadata.merge!(csv_comment(row.sub(/^#{COMMENT_CHAR}*/, "")))
 				else
-					entries += self.csv_entry(row, delimiter)
+					entries += csv_entry(row)
 				end
 			end
 
@@ -34,11 +42,11 @@ module Timesheet
 
 		private
 
-		def self.parse_date(date)
+		def parse_date(date)
 			DateTime.parse(date).to_time.to_i
 		end
 
-		def self.parse_time(time)
+		def parse_time(time)
 			fields = time.split(TIME_DELIMITER)
 
 			raise "Cannot parse '#{time}' as a time of day" if 1 > fields.length || fields.length > 3
@@ -50,7 +58,7 @@ module Timesheet
 			seconds + fields.pop.to_f * Timesheet::SECONDS_IN_AN_HOUR
 		end
 
-		def self.split_into_single_day_entries(midnight, from_after_midnight, to_after_midnight, comment)
+		def split_into_single_day_entries(midnight, from_after_midnight, to_after_midnight, comment)
 			entries = []
 
 			from = midnight+from_after_midnight
@@ -65,21 +73,30 @@ module Timesheet
 			entries
 		end
 
-		def self.csv_comment(comment)
-			key, delimiter, value = comment.partition("=")
+		def extract_field(fields, k)
+			field = fields[@field_map[k]]
 
-			return delimiter.empty? ? {} : {key.strip => JSON.parse("["+value.strip+"]")[0]}
+			field.respond_to?(:each) ? field.to_a.join(@delimiter) : field
 		end
 
-		def self.csv_entry(entry, delimiter)
-			fields = entry.split(delimiter)
+		def entries_from_fields(fields)
+			midnight = parse_date(extract_field(fields, :date_from))
+			to_midnight = parse_date(extract_field(fields, :date_to))
+			from_after_midnight = parse_time(extract_field(fields, :time_from))
+			to_after_midnight = (to_midnight-midnight) + parse_time(extract_field(fields, :time_to))
+			comment = extract_field(fields, :comment)
 
-			midnight = self.parse_date(fields[FIELD_DATE])
-			from_after_midnight = self.parse_time(fields[FIELD_TIME_FROM])
-			to_after_midnight = self.parse_time(fields[FIELD_TIME_TO])
-			comment = fields[FIELD_COMMENT].join(delimiter)
+			split_into_single_day_entries(midnight, from_after_midnight, to_after_midnight, comment)
+		end
 
-			self.split_into_single_day_entries(midnight, from_after_midnight, to_after_midnight, comment)
+		def csv_comment(comment)
+			key, delimiter, value = comment.partition("=")
+
+			delimiter.empty? ? {} : {key.strip => JSON.parse("["+value.strip+"]")[0]}
+		end
+
+		def csv_entry(entry)
+			entries_from_fields(entry.split(@delimiter))
 		end
 	end
 end
