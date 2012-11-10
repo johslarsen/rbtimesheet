@@ -86,21 +86,21 @@ module Timesheet
 		end
 
 		def sum_by_date
-			dates = Hash.new(0)
-			@entries.each { |entry| dates[Timesheet.to_s_date(entry.from)] += entry.duration }
-			return dates
+			@entries.each.with_object(Hash.new(0)) do |entry, dates|
+				dates[Timesheet.to_s_date(entry.from)] += entry.duration
+			end
 		end
 
 		def sum_by_weekday
-			weekdays = [0]*DAYS_IN_A_WEEK
-			@entries.each { |entry| weekdays[Time.at(entry.from).wday] += entry.duration }
-			return weekdays
+			@entries.each.with_object([0]*DAYS_IN_A_WEEK) do |entry, weekdays|
+				weekdays[Time.at(entry.from).wday] += entry.duration
+			end
 		end
 
 		def sum_by_week
-			weeks = [0]*WEEKS_IN_A_YEAR
-			@entries.each { |entry| weeks[Time.at(entry.from).strftime("%W").to_i] += entry.duration }
-			return weeks
+			@entries.each.with_object([0]*WEEKS_IN_A_YEAR) do|entry, weeks|
+				weeks[Time.at(entry.from).strftime("%W").to_i] += entry.duration
+			end
 		end
 	end
 end
