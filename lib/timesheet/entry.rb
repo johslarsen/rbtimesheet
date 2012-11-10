@@ -15,13 +15,13 @@ module Timesheet
 			@to = to.to_i
 			@comment = comment.to_s
 
-			raise ArgumentError, "from must be before to" unless @from < @to
-			raise ArgumentError, "from and to must be on the same day" unless @to <= self.midnight+SECONDS_IN_A_DAY
-			raise ArgumentError, "Require non-empty comment" unless !@comment.empty?
+			raise ArgumentError, "from must be before to"  unless @from < @to
+			raise ArgumentError, "from and to must be on the same day"  unless @to <= midnight+SECONDS_IN_A_DAY
+			raise ArgumentError, "Require non-empty comment"  unless !@comment.empty?
 		end
 
 		def to_s
-			[Timesheet.to_s_date(@from), Timesheet.to_s_time(@from), Timesheet.to_s_time(@to), Timesheet.to_s_duration(self.duration), @comment].join(" ")
+			[Timesheet.to_s_date(@from), Timesheet.to_s_time(@from), Timesheet.to_s_time(@to), Timesheet.to_s_duration(duration), @comment].join(" ")
 		end
 
 		def midnight

@@ -14,7 +14,7 @@ module Timesheet
 			@metadata = metadata.clone
 			@entries = entries.sort
 
-			raise ArgumentError, "entries must be non-empty" unless !entries.empty?
+			raise ArgumentError, "entries must be non-empty"  unless !@entries.empty?
 		end
 
 		def rate
@@ -46,11 +46,11 @@ module Timesheet
 		end
 
 		def value
-			self.rate? ? self.duration*(self.rate.to_f/SECONDS_IN_AN_HOUR) : nil
+			rate? ? duration*(rate.to_f/SECONDS_IN_AN_HOUR) : nil
 		end
 
 		def <=>(other)
-			self.from <=> other.from
+			from <=> other.from
 		end
 
 		def each
@@ -60,20 +60,20 @@ module Timesheet
 		end
 
 		def to_s
-			self.summary
+			summary
 		end
 
 		def summary
 			currency = ""
 			rate_unit = ""
-			if self.rate_currency?
-				currency = "[#{self.rate_currency}]"
+			if rate_currency?
+				currency = "[#{rate_currency}]"
 				rate_unit = "[#{currency[1..-2]}/Hour]"
 			end
 
-			rate_and_value = "* %d%s = %s%s" % [self.rate, rate_unit, Timesheet.to_s_value(self.value), currency]
+			rate_and_value = "* %d%s = %s%s" % [rate, rate_unit, Timesheet.to_s_value(value), currency]
 
-			[Timesheet.to_s_date(self.from), "---", Timesheet.to_s_date(self.to), Timesheet.to_s_duration(self.duration), rate_and_value].join(" ")
+			[Timesheet.to_s_date(from), "---", Timesheet.to_s_date(to), Timesheet.to_s_duration(duration), rate_and_value].join(" ")
 		end
 
 		def sum_by_hour

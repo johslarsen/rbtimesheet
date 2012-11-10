@@ -14,11 +14,9 @@ module Timesheet
 		end
 
 		def clock_in
-			if self.clocked_in?
-				raise "Already clocked in"
-			end
+			raise "Already clocked in"  if clocked_in?
 
-			from = self.now_rounded
+			from = now_rounded
 			start_of_entry = "#{Timesheet.to_s_date(from)}#{@delimiter}#{Timesheet.to_s_time(from)}#{@delimiter}"
 			File.open(@timesheet_filename, 'a') { |f| f.write(start_of_entry) }
 
@@ -27,17 +25,12 @@ module Timesheet
 
 		def clock_out(comment)
 			last_entry = self.last_entry
-			if !self.clocked_in?(last_entry)
-				raise "Not clocked in"
-			elsif last_entry[-1] != @delimiter || last_entry.count(@delimiter) != 2
-				raise "Clocked in, but wrong format"
-			end
+			raise "Not clocked in"  unless clocked_in?(last_entry)
+			raise "Clocked in, but wrong format"  if last_entry[-1] != @delimiter || last_entry.count(@delimiter) != 2
 
 			clocked_in_timestamp = DateTime.parse(last_entry).to_time.to_i
-			clocked_out_timestamp = self.now_rounded
-			if clocked_in_timestamp == clocked_out_timestamp
-				clocked_out_timestamp += @rounding_amount
-			end
+			clocked_out_timestamp = now_rounded
+			clocked_out_timestamp += @rounding_amount  if clocked_in_timestamp == clocked_out_timestamp
 
 			rest_of_entry = "#{Timesheet.to_s_time(clocked_out_timestamp)}#{@delimiter}#{comment}\n"
 			File.open(@timesheet_filename, 'a') { |f| f.write(rest_of_entry) }
@@ -69,7 +62,7 @@ module Timesheet
 
 		def now_rounded
 			now = Time.now.to_i
-			now += Time.now.utc_offset # now as if it was utc
+			now += Time.now.utc_offset # now as if it was UTC
 
 			seconds_past_now_floored = now % @rounding_amount
 			now_floored = now - seconds_past_now_floored

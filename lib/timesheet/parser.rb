@@ -52,8 +52,8 @@ module Timesheet
 			raise "Cannot parse '#{time}' as a time of day" if 1 > fields.length || fields.length > 3
 
 			seconds = 0
-			seconds += fields.pop.to_f                                  if fields.length == 3
-			seconds += fields.pop.to_f * Timesheet::SECONDS_IN_A_MINUTE if fields.length == 2
+			seconds += fields.pop.to_f                                   if fields.length == 3
+			seconds += fields.pop.to_f * Timesheet::SECONDS_IN_A_MINUTE  if fields.length == 2
 
 			seconds + fields.pop.to_f * Timesheet::SECONDS_IN_AN_HOUR
 		end
