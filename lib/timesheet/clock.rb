@@ -7,10 +7,9 @@ module Timesheet
 
 		SEEK_STEP = 256
 
-		def initialize(timesheet_filename, delimiter="\t", comment_char="#", rounding_amount=15*60)
+		def initialize(timesheet_filename, delimiter="\t", rounding_amount=15*Timesheet::SECONDS_IN_A_MINUTE)
 			@timesheet_filename = timesheet_filename
 			@delimiter = delimiter
-			@comment_char = comment_char
 			@rounding_amount = rounding_amount
 		end
 
