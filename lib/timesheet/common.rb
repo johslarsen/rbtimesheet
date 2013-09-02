@@ -29,4 +29,8 @@ module Timesheet
 	def self.to_s_value(n)
 		"%.2f" % n
 	end
+
+	def self.midnight(utime)
+		utime-(utime%SECONDS_IN_A_DAY)
+	end
 end

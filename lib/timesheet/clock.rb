@@ -26,13 +26,21 @@ module Timesheet
 		def clock_out(comment)
 			last_entry = self.last_entry
 			raise "Not clocked in"  unless clocked_in?(last_entry)
-			raise "Clocked in, but wrong format"  if last_entry[-1] != @delimiter || last_entry.count(@delimiter) != 2
+			raise "Clocked in, but wrong format"  if last_entry[-@delimiter.length..-1] != @delimiter || last_entry.scan(@delimiter).size != 2
 
 			clocked_in_timestamp = DateTime.parse(last_entry).to_time.to_i
 			clocked_out_timestamp = now_rounded
-			clocked_out_timestamp += @rounding_amount  if clocked_in_timestamp == clocked_out_timestamp
+			clocked_out_midnight = Timesheet.midnight(clocked_out_timestamp)
 
-			rest_of_entry = "#{Timesheet.to_s_time(clocked_out_timestamp)}#{@delimiter}#{comment}\n"
+			clocked_out_after_midnight = clocked_out_timestamp - clocked_out_midnight
+			clocked_out_after_midnight += clocked_in_timestamp-clocked_out_timestamp + @rounding_amount  if clocked_in_timestamp >= clocked_out_timestamp
+
+			if clocked_out_midnight > clocked_in_timestamp
+				clocked_out_after_midnight += clocked_out_midnight-Timesheet.midnight(clocked_in_timestamp)
+			end
+
+			clocked_out_relative_timestring = "%02d:%02d" % (clocked_out_after_midnight/Timesheet::SECONDS_IN_A_MINUTE).divmod(Timesheet::MINUTES_IN_AN_HOUR)
+			rest_of_entry = "#{clocked_out_relative_timestring}#{@delimiter}#{comment}\n"
 			File.open(@timesheet_filename, 'a') { |f| f.write(rest_of_entry) }
 
 			last_entry.chomp+rest_of_entry

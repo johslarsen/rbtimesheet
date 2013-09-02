@@ -25,7 +25,7 @@ module Timesheet
 		end
 
 		def midnight
-			@from - (@from%SECONDS_IN_A_DAY)
+			Timesheet.midnight(@from)
 		end
 
 		def duration(limit_from=nil, limit_to=nil)

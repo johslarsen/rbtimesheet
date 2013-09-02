@@ -1,9 +1,32 @@
 #!/usr/bin/env ruby
+
+require 'optparse'
 require_relative '../lib/timesheet/clock'
 
+options = {}
+optionParser = OptionParser.new do |o|
+	o.banner = "Usage: #{$0} [options] TIMESHEET_FILE"
+
+	options[:delimiter] = "\t"
+	o.on("-d", "--delimiter DELIMITER", "Set the delimiter used in the CSV file to DELIMITER, default \"\\t\"") do |d|
+		options[:delimiter] = d
+	end
+
+	options[:rounding_amount] = 15*Timesheet::SECONDS_IN_A_MINUTE
+	o.on("-r", "--rounding-amount SECONDS", "Set the rounding amount to SECONDS, default 15 minutes") do |i|
+		options[:rounding_amount] = i.to_i
+	end
+
+	o.on("-h", "-?", "--help", "Show this display") do
+		puts o
+		exit
+	end
+end
+optionParser.parse!
+
 if ARGV.length != 2
-	$stderr.puts("Usage: #{$0} TIMESHEET_FILE COMMENT")
+	puts optionParser
 	exit(1)
 end
 
-puts(Timesheet::Clock.new(ARGV[0]).clock_out(ARGV[1]))
+puts(Timesheet::Clock.new(ARGV[0], options[:delimiter], options[:rounding_amount]).clock_out(ARGV[1]))

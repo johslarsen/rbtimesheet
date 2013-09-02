@@ -1,21 +1,26 @@
 #!/usr/bin/env ruby
+
+require 'optparse'
 require_relative '../lib/timesheet/ascii_tables'
 require_relative '../lib/timesheet/parser'
 
-if 1 > ARGV.length || ARGV.length > 2
-	$stderr.puts("Usage: #{$0} TIMESHEET_FILE [DELIMITER]")
-	exit(1)
+options = {}
+optionParser = OptionParser.new do |o|
+	o.banner = "Usage: #{$0} [options] TIMESHEET_CSV_FILE..."
+
+	options[:delimiter] = "\t"
+	o.on("-d", "--delimiter DELIMITER", "Set the delimiter used in the CSV file to DELIMITER, default \"\\t\"") do |d|
+		options[:delimiter] = d
+	end
+
+	o.on("-h", "-?", "--help", "Display this screen") do
+		puts o
+		exit
+	end
 end
+optionParser.parse!
 
-
-if ARGV[0] == "-"
-	csv = $stdin.read
-else
-	csv = File.open(ARGV[0]) { |f| f.read() }
-end
-delimiter = ARGV.length == 2 ? ARGV[1] : "\t"
-
-ts = Timesheet::Parser.new(delimiter:delimiter).csv(csv)
+ts = Timesheet::Parser.new.csv(ARGF.read, options[:delimiter])
 ts_table = Timesheet::AsciiTables.new(ts)
 
 puts "##### Report for the timesheet \"#{ARGV[0]}\" #####"
